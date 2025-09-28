@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: 새로운 기능을 제안하거나 아이디어 공유
+about: 새로운 기능을 제안하거나 아이디어 공유를 위한 이슈
 title: ''
 labels: ''
 assignees: ''
