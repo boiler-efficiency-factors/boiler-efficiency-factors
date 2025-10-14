@@ -1,8 +1,20 @@
 # libararies
 import pandas as pd
 from pathlib import Path
+from typing import Optional
 
-def load_data(start_date, end_date):
+def load_data(start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+    """
+    보일러 csv데이터를 받아 데이터프레임으로 변환하는 함수
+
+    Args:
+        start_date (str): 로드를 시작할 날짜. 'YYYY-MM-DD' 형식.
+        end_date (str): 로드를 종료할 날짜. 'YYYY-MM-DD' 형식.
+
+    Returns:
+        Optional[pd.DataFrame]: 로드하고 합친 데이터가 담긴 데이터프레임.
+                                해당 기간에 파일이 없을 경우 None을 반환합니다.
+    """
     
     columns = [
         '생성일', '부하율', '설정 압력', '보일러 압력', '송풍기 인버터 출력',
@@ -41,7 +53,6 @@ def load_data(start_date, end_date):
                     index_col=False,
                     names=columns
                 )
-                display(temp_df.head())
                 # 2. 데이터프레임을 리스트에 추가합니다.
                 dfs_to_concat.append(temp_df)
                 # print(f"  - 로드 성공: {filename}")
@@ -58,13 +69,3 @@ def load_data(start_date, end_date):
     else:
         print("\n❌ 해당 기간에 로드할 데이터 파일이 없습니다.")
         return None
-
-# --- 테스트 코드 ---
-# start_date_input = '2025-01-01'
-# end_date_input = '2025-01-01'
-
-# rowdata_df = load_data(start_date=start_date_input, end_date=end_date_input)
-
-# if rowdata_df is not None:
-#     print("\n\n--- [결과] 로드된 데이터 확인 (상위 5개) ---")
-#     display(rowdata_df.head())
