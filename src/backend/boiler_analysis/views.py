@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 import pandas as pd
 import json
 import os
@@ -14,6 +16,33 @@ from .serializers import (
 from .services import ModelTrainingService, DataProcessingService
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="프로젝트 목록 조회",
+        description="사용자의 모든 분석 프로젝트 목록을 조회합니다.",
+        tags=["프로젝트 관리"]
+    ),
+    create=extend_schema(
+        summary="프로젝트 생성",
+        description="새로운 분석 프로젝트를 생성합니다.",
+        tags=["프로젝트 관리"]
+    ),
+    retrieve=extend_schema(
+        summary="프로젝트 상세 조회",
+        description="특정 프로젝트의 상세 정보를 조회합니다.",
+        tags=["프로젝트 관리"]
+    ),
+    update=extend_schema(
+        summary="프로젝트 수정",
+        description="프로젝트 정보를 수정합니다.",
+        tags=["프로젝트 관리"]
+    ),
+    destroy=extend_schema(
+        summary="프로젝트 삭제",
+        description="프로젝트를 삭제합니다.",
+        tags=["프로젝트 관리"]
+    ),
+)
 class AnalysisProjectViewSet(viewsets.ModelViewSet):
     serializer_class = AnalysisProjectSerializer
     
@@ -23,6 +52,12 @@ class AnalysisProjectViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
+    @extend_schema(
+        summary="CSV 파일 업로드",
+        description="보일러 데이터 CSV 파일을 업로드하고 자동으로 전처리를 수행합니다.",
+        tags=["데이터 관리"],
+        request=FileUploadSerializer,
+    )
     @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
     def upload_csv(self, request, pk=None):
         """CSV 파일 업로드"""
@@ -58,6 +93,11 @@ class AnalysisProjectViewSet(viewsets.ModelViewSet):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="데이터 미리보기",
+        description="업로드된 CSV 데이터의 처음 10개 행을 미리 봅니다.",
+        tags=["데이터 관리"],
+    )
     @action(detail=True, methods=['get'])
     def data_preview(self, request, pk=None):
         """데이터 미리보기"""
@@ -79,6 +119,23 @@ class AnalysisProjectViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="AI 모델 훈련",
+        description="선택한 AI 모델(LightGBM, XGBoost, Random Forest, GBM)로 훈련을 수행합니다.",
+        tags=["모델 훈련"],
+        examples=[
+            OpenApiExample(
+                'LightGBM 예시',
+                value={
+                    'model_type': 'lightgbm',
+                    'parameters': {
+                        'num_leaves': 31,
+                        'learning_rate': 0.05
+                    }
+                }
+            ),
+        ]
+    )
     @action(detail=True, methods=['post'])
     def train_model(self, request, pk=None):
         """모델 훈련"""
@@ -123,6 +180,11 @@ class AnalysisProjectViewSet(viewsets.ModelViewSet):
                 'error': f'모델 훈련 중 오류가 발생했습니다: {str(e)}'
             }, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="분석 결과 조회",
+        description="프로젝트의 모든 분석 결과를 조회합니다.",
+        tags=["분석 결과"],
+    )
     @action(detail=True, methods=['get'])
     def analysis_results(self, request, pk=None):
         """분석 결과 조회"""

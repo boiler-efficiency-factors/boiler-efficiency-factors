@@ -25,3 +25,6 @@ C:\Users\User\boiler-efficiency-factors\src\backend\boiler_analysis\urls.py chan
 C:\Users\User\boiler-efficiency-factors\src\backend\boiler_analysis\urls.py changed, reloading.
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /api/docs/ HTTP/1.1" 200 4660
+"GET /api/schema/ HTTP/1.1" 200 46663

@@ -120,7 +120,7 @@ class ModelTrainingService:
             'lightgbm': self._train_lightgbm,
             'xgboost': self._train_xgboost,
             'random_forest': self._train_random_forest,
-            'gradient_boosting': self._train_gradient_boosting
+            'gradient_boosting': self._train_gradient_boosting,
         }
     
     def train_model(self, model_config):
@@ -239,6 +239,9 @@ class ModelTrainingService:
         default_params = {
             'n_estimators': 100,
             'max_depth': None,
+            'min_samples_split': 2,
+            'min_samples_leaf': 1,
+            'max_features': 'sqrt',
             'random_state': 42
         }
         default_params.update(parameters)
@@ -258,9 +261,11 @@ class ModelTrainingService:
             'n_estimators': 100,
             'learning_rate': 0.1,
             'max_depth': 3,
-            'random_state': 42,
-            'subsample': 0.8,
-            'max_features': 'sqrt'
+            'min_samples_split': 2,
+            'min_samples_leaf': 1,
+            'subsample': 1.0,
+            'max_features': None,
+            'random_state': 42
         }
         default_params.update(parameters)
         
