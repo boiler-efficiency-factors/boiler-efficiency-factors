@@ -15,7 +15,6 @@ from .serializers import (
 )
 from .services import ModelTrainingService, DataProcessingService
 
-
 @extend_schema_view(
     list=extend_schema(
         summary="프로젝트 목록 조회",
