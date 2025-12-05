@@ -6,26 +6,36 @@ User = get_user_model()
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
-        style={'input_type': 'password'},
-        write_only = True,
-        required=True
-    )
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}) 
+    
+    verify_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'})
 
     class Meta:
-        model=User
-        fields=['user_id', 'user_name', 'password']
-        read_only_fields = ['user_id']
-    
-    @transaction.atomic
+        model = User
+        fields = ['user_name', 'password', 'verify_password']
+        extra_kwargs = {
+            'user_name': {'required': True}
+        }
+
+    def validate(self, data):
+        if not data.get('password') or not data.get('verify_password'):
+            raise serializers.ValidationError({"detail": "Password and confirmation are required."})
+
+        if data['password'] != data['verify_password']:
+            raise serializers.ValidationError({"verify_password": "Passwords do not match."})
+
+        data.pop('verify_password')
+        
+        return data
+
     def create(self, validated_data):
-        """회원가입 시 비밀번호를 해싱하여 저장"""
-        password = validated_data.pop('password')
-        user_name = validated_data.pop('user_name')
-
         user = User.objects.create_user(
-            username=user_name,
-            password=password,
-            **validated_data
+            user_name=validated_data['user_name'],
+            password=validated_data['password']
         )
-
         return user
