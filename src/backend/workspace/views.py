@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -15,6 +15,29 @@ from .serializers import WorkspaceCreateSerializer
 class WorkspaceCreateView(APIView):
     @extend_schema(
             request=WorkspaceCreateSerializer,
+            examples=[
+                OpenApiExample(
+                    '모델 생성 요청 예시',
+                    value={
+                        "workspace": "보일러_프로젝트_A",
+                        "model_name": "lightgbm",
+                        "start_date": "2025-12-05",
+                        "end_date": "2025-12-31",
+                        "parameter": { 
+                            "n_estimators": 0.9,
+                            "learning_rate": 0.01,
+                            "max_depth": 10
+                        },
+                        "tuning": "grid",
+                        "dependent_var": "열효율",
+                        "excluded_var": [
+                            "센서1", 
+                            "센서2"
+                        ]
+                    },
+                    request_only=True
+                ),
+            ],
             responses={
                 status.HTTP_201_CREATED: {
                     "type": "object",
