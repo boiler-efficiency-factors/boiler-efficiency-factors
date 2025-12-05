@@ -4,6 +4,7 @@ import uuid
 from django.conf import settings
 
 class MLModelChoices(TextChoices):
+    #TODO: 일방적으로 소문자만 들어가게 해야하나요?
     LIGHTGBM = 'lightgbm', 'LightGBM'
     XGBOOST = 'xgboost', 'XGBoost'
     RANDOM_FOREST = 'random_forest', 'Random_Forest'
