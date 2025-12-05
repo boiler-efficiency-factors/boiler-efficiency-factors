@@ -27,7 +27,7 @@ class Model(models.Model):
     parameter = models.JSONField(null=True, blank=True)
     tuning = models.CharField(max_length=50)  # 'random', 'grid', 'bayesian' 등
     dependent_var = models.TextField()  # 종속변수 목록
-    excluded_var = models.TextField(null=True, blank=True)  # 제외할 변수
+    excluded_var = models.JSONField(default=list, null=True, blank=True)  # 제외할 변수
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

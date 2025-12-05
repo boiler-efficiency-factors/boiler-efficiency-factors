@@ -1,5 +1,3 @@
-# workspace/ml_pipelines/base_trainer.py
-
 class BaseTrainer:
     """모든 AI 모델 트레이너의 기본 인터페이스"""
     

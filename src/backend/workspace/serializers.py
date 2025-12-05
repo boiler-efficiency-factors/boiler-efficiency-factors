@@ -5,8 +5,8 @@ class WorkspaceCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Model
-        fields = ['workspace', 'model_name', 'start_date' 'end_date',
-                  'parameter', 'tuning', 'independent_var', 'excluded_var']
+        fields = ['workspace', 'model_name', 'start_date', 'end_date',
+                  'parameter', 'tuning', 'dependent_var', 'excluded_var']
         
         extra_kwargs = {
             'workspace': {'required': True, 'allow_blank': False},
