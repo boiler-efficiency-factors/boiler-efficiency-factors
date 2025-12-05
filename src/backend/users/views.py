@@ -4,6 +4,7 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView # JWT 로그인
+from rest_framework_simplejwt.views import TokenBlacklistView # JWT 로그인
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer # 토큰 생성
 from .serializers import UserRegisterSerializer
 
@@ -14,6 +15,12 @@ class LoginTokenView(TokenObtainPairView):
     """
     permission_classes = [AllowAny]
     serializer_class = TokenObtainPairSerializer
+
+class LogoutView(TokenBlacklistView):
+    """
+    POST /api/auth/logout/
+    클라이언트가 Refresh Token을 블랙리스트에 등록하여 무효화합니다.
+    """
 
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
