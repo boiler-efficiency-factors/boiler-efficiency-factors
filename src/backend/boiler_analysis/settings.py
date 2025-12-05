@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-7$=ehtg7pqh4-+xpy)8qqh!qwghhwv*l99y1**rsh8fn*c6=&7
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -132,6 +132,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'users.User'
+
 
 # ==============================================================================
 # 7. 파일 관리 (FILES: Static, Media)
@@ -173,14 +175,25 @@ CORS_ALLOW_CREDENTIALS = True
 
 # JWT_AUTH settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False, # True 로 설정할 경우, TokenRefeshView 에 refresh token 을 보내면 새로운 access token 과 refresh token 이 반환
-    'BLACKLIST_AFTER_ROTATION': True, # True시 기존에 있던 refresh token 은 blacklist 에 등록됨
-    'TOKEN_USER_CLASS': 'instragram.User',
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    
+    "USER_ID_FIELD": "user_id",
+    
+    "USER_MODEL": "users.User", # 💡 실제 User 모델이 있는 앱 이름으로 변경하세요.
+    
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY, # 생성된 토큰의 콘텐츠에 서명하는 데 사용되는 서명 키
-    'AUTH_HEADER_TYPES': ('JWT',), # 인증에 사용할 인증 헤더 이름
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    
+    'USER_ID_CLAIM': 'user_id',
 }
 
 # Spectacular settings (Swagger/OpenAPI)
