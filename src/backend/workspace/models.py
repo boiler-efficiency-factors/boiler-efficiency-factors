@@ -11,6 +11,7 @@ class MLModelChoices(TextChoices):
 
 
 class SessionStateChoices(TextChoices):
+    CREATED = 'created'
     TRAINING = 'training'
     COMPLETED = 'completed'
     FAILED = 'failed'
