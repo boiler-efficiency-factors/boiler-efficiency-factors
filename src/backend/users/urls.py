@@ -1,9 +1,17 @@
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
+from .views import LoginTokenView, UserRegisterView
+
 urlpatterns = [
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # 로그인 (토큰 발급)
+    # URL: POST /api/auth/login/
+    path('auth/login/', LoginTokenView.as_view(), name='auth-login'),
+
+    # 토큰 갱신
+    # URL: POST /api/auth/refresh/
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token-refresh'), 
+    
+    # 회원가입
+    # URL: POST /api/user/register/
+    path('user/register/', UserRegisterView.as_view(), name='user-register'),
 ]
