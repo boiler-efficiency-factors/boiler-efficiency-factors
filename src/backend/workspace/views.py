@@ -13,37 +13,41 @@ from .tasks import start_model_training
 from .serializers import WorkspaceCreateSerializer
 
 class WorkspaceCreateView(APIView):
-    def post(self, request, user_id):
-        User = get_user_model()
-
-        #TODO: User 유효성 검사
-        try:
-            user = get_object_or_404(User, pk=user_id)
-        except Exception:
-            return Response({"error": "User not found"},
-                            status=status.HTTP_404_NOT_FOUND)
+    @extend_schema(
+            request=WorkspaceCreateSerializer,
+            responses={
+                status.HTTP_201_CREATED: {
+                    "type": "object",
+                    "properties": {
+                        "model_id": {"type": "string", "format": "uuid"},
+                        "session_id": {"type": "string", "format": "uuid"},
+                        "message": {"type": "string"}
+                    }
+                },
+                status.HTTP_400_BAD_REQUEST: WorkspaceCreateSerializer,
+            }
+    )
+    def post(self, request):
+        user = request.user
         
         #TODO: Serializer 유효성 검사
         serializer = WorkspaceCreateSerializer(data=request.data)
-        serializer.is_valid(reise_exception=True)
+        serializer.is_valid(raise_exception=True)
 
         #TODO: DB 작업 시작
         with transaction.atomic():
-            model_instance = WorkspaceCreateSerializer.save() 
+            model_instance = serializer.save() 
             
-            # 2. UserSequence 객체 생성 및 저장 (history 기록)
             UserSequence.objects.create(
                 user_id=user,
                 model_id=model_instance
             )
             
-            # 3. Session 객체 생성 및 TRAINING 상태로 초기화
             session_instance = Session.objects.create(
                 model_id=model_instance,
-                state=SessionStateChoices.TRAINING # 🌟 즉시 TRAINING 상태 반영
+                state=SessionStateChoices.TRAINING
             )
             
-            # 4. Celery에 session_id를 인자로 넘겨 작업 위임
             start_model_training.delay(str(session_instance.session_id))
         
         return Response({
