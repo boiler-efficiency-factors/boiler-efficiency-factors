@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Max, TextChoices
 import uuid
-
+from django.conf import settings
 
 class MLModelChoices(TextChoices):
     LIGHTGBM = 'lightgbm', 'LightGBM'
@@ -37,7 +37,7 @@ class Model(models.Model):
     
 
 class UserSequence(models.Model):
-    user_id = models.ForeignKey('User', on_delete=models.CASCADE, db_column='user_id')
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='user_id')
     model_id = models.ForeignKey('Model', on_delete=models.CASCADE, db_column='model_id')
     user_sequence_id = models.IntegerField(db_column='user_sequence_id', default=1)
     created_at = models.DateTimeField(auto_now_add=True)
