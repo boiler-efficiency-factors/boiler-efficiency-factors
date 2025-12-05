@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-7$=ehtg7pqh4-+xpy)8qqh!qwghhwv*l99y1**rsh8fn*c6=&7
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
 
     # 3. 로컬 앱
@@ -132,6 +133,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'users.User'
+
 
 # ==============================================================================
 # 7. 파일 관리 (FILES: Static, Media)
@@ -152,9 +155,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication'
-        #'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -170,6 +173,29 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# JWT_AUTH settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    
+    "USER_ID_FIELD": "user_id",
+    
+    "USER_MODEL": "users.User", # 💡 실제 User 모델이 있는 앱 이름으로 변경하세요.
+    
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    
+    'USER_ID_CLAIM': 'user_id',
+}
 
 # Spectacular settings (Swagger/OpenAPI)
 SPECTACULAR_SETTINGS = {
