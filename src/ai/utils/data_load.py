@@ -2,6 +2,13 @@
 import pandas as pd
 from pathlib import Path
 from typing import Optional
+import sys
+
+# TODO: 파일 경로 설정
+CURRENT_FILE_PATH = Path(__file__).resolve()
+UTILS_DIR = CURRENT_FILE_PATH.parent
+PROJECT_ROOT = UTILS_DIR.parent
+DATA_DIR = PROJECT_ROOT / 'data' / 'rowdata-2025'
 
 def load_data(start_date: str, end_date: str) -> Optional[pd.DataFrame]:
     """
@@ -32,8 +39,9 @@ def load_data(start_date: str, end_date: str) -> Optional[pd.DataFrame]:
     # 1. 빈 리스트를 생성합니다.
     dfs_to_concat = []
     
-    data_path = '../data/rowdata-2025'
-    data_dir = Path(data_path)
+    # data_path = '../data/rowdata-2025'
+    # data_dir = Path(data_path)
+    data_dir = DATA_DIR
     dates = pd.date_range(start=start_date, end=end_date)
     
     print(f"🔍 ['{start_date}'부터 '{end_date}'까지의 데이터를 로드]")
@@ -69,3 +77,14 @@ def load_data(start_date: str, end_date: str) -> Optional[pd.DataFrame]:
     else:
         print("\n❌ 해당 기간에 로드할 데이터 파일이 없습니다.")
         return None
+    
+start_date_input = '2025-01-01'
+end_date_input = '2025-03-30'
+
+rowdata_df = load_data(start_date=start_date_input, end_date=end_date_input)
+
+if rowdata_df is not None:
+    print("\n--- [결과] 로드된 데이터 확인 (상위 5개) ---")
+    print(rowdata_df.head())
+else:
+    print("\n--- [결과] 최종 데이터프레임이 비어있어 출력할 내용이 없습니다. ---")

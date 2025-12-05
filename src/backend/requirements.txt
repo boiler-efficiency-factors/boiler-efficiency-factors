@@ -1,6 +1,11 @@
+# Django packages
 Django>=4.0
 djangorestframework
 django-cors-headers
+drf-spectacular
+django-rest-framework-docs
+
+# AI packages
 pandas
 numpy
 scikit-learn
