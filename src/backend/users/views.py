@@ -1,32 +1,32 @@
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from .models import User
-
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny # 회원가입은 인증 불필요
+from rest_framework_simplejwt.views import TokenObtainPairView # JWT 로그인
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer # 토큰 생성
+from .serializers import UserRegisterSerializer
 
-@api_view[('')]
-# Auth Endpoints
-class LoginView(APIView):
+class LoginTokenView(TokenObtainPairView):
     """
     POST /api/auth/login
-    사용자 로그인 처리
+    사용자 로그인 처리 Simple JWT의 표준 뷰 상속
     """
-    def post(self, request):
-        # TODO: 1. 시리얼라이저를 사용하여 사용자 입력(user_name, password) 검증
-        # TODO: 2. Django의 authenticate를 사용하여 사용자 인증
-        # TODO: 3. 인증 성공 시, 세션이나 토큰(JWT 등) 생성 및 반환
-        return Response({"message": "로그인 성공"}, status=status.HTTP_200_OK)
+    permission_classes = [AllowAny]
 
-
-# User Endpoints
 class UserRegisterView(APIView):
-    """
-    POST /api/user/register
-    신규 사용자 회원가입 처리
-    """
+
     def post(self, request):
-        # TODO: 1. User 시리얼라이저를 사용하여 사용자 입력 검증 및 유효성 확인
-        # TODO: 2. 비밀번호 해싱 및 User 모델 객체 생성 후 저장
-        # TODO: 3. 성공 응답 반환
-        return Response({"message": "회원가입 성공"}, status=status.HTTP_201_CREATED)
+        serializer = UserRegisterSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user = serializer.save()
+            
+            # 2. 토큰 생성 및 쿠키 설정 로직을 모두 제거!
+
+            return Response({
+                "user_id": user.user_id,
+                "user_name": user.user_name,
+                "message": "회원가입 성공. 로그인 페이지로 이동하세요."
+            }, status=status.HTTP_201_CREATED) # 201 Created 반환
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
