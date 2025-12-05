@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # 3. 로컬 앱
     'boiler_analysis',
     'users'
+    'workspace'
 ]
 
 

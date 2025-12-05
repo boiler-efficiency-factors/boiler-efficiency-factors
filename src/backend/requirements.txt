@@ -4,6 +4,7 @@ djangorestframework
 django-cors-headers
 drf-spectacular
 django-rest-framework-docs
+djangorestframework-simplejwt
 
 # AI packages
 pandas
