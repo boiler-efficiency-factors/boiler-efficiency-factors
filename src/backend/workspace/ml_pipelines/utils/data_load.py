@@ -8,7 +8,7 @@ import sys
 CURRENT_FILE_PATH = Path(__file__).resolve()
 UTILS_DIR = CURRENT_FILE_PATH.parent
 PROJECT_ROOT = UTILS_DIR.parent
-DATA_DIR = PROJECT_ROOT / 'data' / 'rowdata-2025'
+DATA_DIR = PROJECT_ROOT / 'data' / 'rowdata_2025'
 
 def load_data(start_date: str, end_date: str) -> Optional[pd.DataFrame]:
     """

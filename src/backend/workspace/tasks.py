@@ -7,20 +7,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 @shared_task
-def start_model_training(session_id):
-    """모델 학습을 백그라운드에서 실행하는 Celery Task"""
+def start_model_training(session_id: str):
     session = None
-
     try:
-        # get session_id for model_id
         session = Session.objects.get(session_id=session_id)
-        model_instance = session_id.model_id
+        model_instance = session.model_id
 
-        # model select with model_name
+        session.state = SessionStateChoices.TRAINING
+        session.save(update_fields=['state'])
+
         TrainerClass = trainer_factory.get_trainer(model_instance.model_name)
         trainer = TrainerClass(model_instance, session)
 
-        #TODO: run_training() 내부에서 COMPLETED 상태를 저장해야 함.
+        #TODO: run_training()에서 각 모듈 내부에서 FAILED/COMPLETED 상태 저장.
         trainer.run_training()
     
     except Session.DoesNotExist:
@@ -31,7 +30,7 @@ def start_model_training(session_id):
         if session:
             session.state = SessionStateChoices.FAILED
             session.finished_at = timezone.now()
-            session.save()
+            session.save(update_fields=['state', 'finished_at'])
             logger.error(f"Training failed for session {session_id}: {e}", exc_info=True)
 
         raise e
