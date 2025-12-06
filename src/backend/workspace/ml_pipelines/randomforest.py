@@ -3,6 +3,9 @@ from .base_trainer import BaseTrainer
 from ..models import SessionStateChoices
 from .utils.data_loader import data_loader
 from .utils.preprocessor import preprocessor
+from .utils.metrics import calculate_metrics
+from .utils.feature_importance import generate_feature_importance
+
 
 import pandas as pd
 import numpy as np
@@ -45,8 +48,8 @@ class randomforestTrainer(BaseTrainer):
             rf_model.fit(X_train, y_train)
             
             # 결과 계산
-            metrics = self._calculate_metrics(rf_model, X_test, y_test)
-            feature_importance = self._generate_feature_importance(rf_model, X_train)
+            metrics = calculate_metrics(rf_model, X_test, y_test)
+            feature_importance = generate_feature_importance(rf_model, X_train)
             
             self.session.metrics = metrics
             self.session.feature = feature_importance
@@ -89,76 +92,3 @@ class randomforestTrainer(BaseTrainer):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
 
         return X_train, X_test, y_train, y_test #Loaded Data Structure
-
-    def _calculate_metrics(self, model, X_test, y_test):
-
-        y_pred = model.predict(X_test)
-
-        y_test_arr = np.array(y_test)
-        y_pred_arr = np.array(y_pred)
-
-        # MSE
-        mse = mean_squared_error(y_test_arr, y_pred_arr)
-        
-        # RMSE
-        rmse = np.sqrt(mse)
-
-        # MAE
-        mae = mean_absolute_error(y_test_arr, y_pred_arr)
-
-        # MAPE
-        non_zero_mask = y_test_arr != 0
-        if np.any(non_zero_mask):
-            mape = float(
-                np.mean(
-                    np.abs(
-                        (y_test_arr[non_zero_mask] - y_pred_arr[non_zero_mask])
-                        / y_test_arr[non_zero_mask]
-                    )
-                ) * 100.0
-            )
-        else:
-            mape = None
-    
-        return {
-            "mse": float(mse),
-            "rmse": float(rmse),
-            "mae": float(mae),
-            "mape": float(mape) if mape is not None else None,
-        }
-
-    def _generate_feature_importance(self, model, X_train):
-
-        importance = model.feature_importances_
-
-        if hasattr(X_train, "columns"):
-            feature_names = list(X_train.columns)
-        else:
-            feature_names = [f"f{i}" for i in range(len(importance))]
-        
-        importance_df = pd.DataFrame({
-            "feature": feature_names,
-            "importance": importance
-        })
-        importance_df = importance_df.sort_values(by="importance", ascending=False)
-        
-        # 중요도 상위 10개 feature
-        top_n = 10
-        top_features = importance_df.head(top_n).iloc[::-1]
-
-        # 시각화
-        plt.figure(figsize=(12, 6))
-        plt.barh(top_features["feature"], top_features["importance"])
-        plt.xlabel("Importance", fontsize=12)
-        plt.ylabel("Feature", fontsize=12)
-        plt.title(f"Top {top_n} Important Features", fontsize=14)
-        plt.tight_layout()
-
-        # 이미지 버퍼에 저장 → base64 문자열로 변환
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format="png")
-        plt.close()
-        buffer.seek(0)
-
-        img_base64 = base64.b64encode(buffer.read()).decode("utf-8")
-        return img_base64 # base64_xgboost_string 
