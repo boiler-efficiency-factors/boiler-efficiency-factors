@@ -4,6 +4,11 @@ djangorestframework
 django-cors-headers
 drf-spectacular
 django-rest-framework-docs
+djangorestframework-simplejwt
+
+# AI 비동기 처리
+celery
+redis
 
 # AI packages
 pandas

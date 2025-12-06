@@ -5,7 +5,11 @@ from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 urlpatterns = [
+    # user
     path('api/', include('users.urls')),
+
+    # workspace
+    path('api/', include('workspace.urls')),
     
     # Swagger/OpenAPI 문서
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
