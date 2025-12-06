@@ -9,9 +9,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from .models import UserSequence, Session, SessionStateChoices
+from .models import UserSequence, Session, SessionStateChoices, Model
 from .tasks import start_model_training
-from .serializers import WorkspaceCreateSerializer
+from .serializers import WorkspaceCreateSerializer, WorkspaceDetailSerializer
 
 class WorkspaceCreateView(APIView):
     @extend_schema(
@@ -88,3 +88,13 @@ class WorkspaceCreateView(APIView):
                 "message": f"오류 발생: {e}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class WorkspaceDetailView(APIView):
+    def get(self, request, model_id):
+        # model_id 로 Model 인스턴스 조회 (없으면 404)
+        model_instance = get_object_or_404(Model, model_id=model_id)
+
+        # 직렬화
+        serializer = WorkspaceDetailSerializer(model_instance)
+
+        # 응답 반환
+        return Response(serializer.data, status=status.HTTP_200_OK)

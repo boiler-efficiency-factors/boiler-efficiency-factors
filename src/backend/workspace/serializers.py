@@ -27,3 +27,14 @@ class WorkspaceCreateSerializer(serializers.ModelSerializer):
             'parameter': {'required': False},
             'excluded_var': {'required': False}
         }
+
+class WorkspaceDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Model
+        
+        fields = [
+            "model_id", "workspace", "model_name",
+            "start_date", "end_date", "parameter",
+            "tuning", "dependent_var", "excluded_var",
+            "created_at", "updated_at",
+        ]
