@@ -1,19 +1,18 @@
 from django.utils import timezone
-from .base_trainer import BaseTrainer 
+from .base_trainer import BaseTrainer
 from ..models import SessionStateChoices
 # import lightgbm as lgb
 
 class lightgbmTrainer(BaseTrainer):
-    """BaseTrainer의 __init__ 메서드(model, session 저장)를 자동으로 상속"""
-    
+    """lightGBM 모델 모듈"""
+    # BaseTrainer.__init__을 상속받아 model, session 인스턴스를 가짐
+
     def run_training(self):
         """
         LightGBM 학습을 수행하고 Session 객체에 결과 및 완료 상태를 저장
         """
         
         try:
-            # 1. 🌟 데이터 준비 및 파라미터 로드
-            # self.model 객체를 통해 DB에 저장된 정보를 가져옵니다.
             start_date = self.model.start_date
             end_date = self.model.end_date
             params = self.model.parameter or {} # JSONField 파라미터 로드
@@ -41,9 +40,6 @@ class lightgbmTrainer(BaseTrainer):
             # 이중 처리가 되지만, 여기서도 필요하다면 FAILED 처리가 가능합니다.
             # 여기서는 예외를 다시 발생시켜 tasks.py의 except 블록에서 FAILED 처리를 유도합니다.
             raise e
-
-
-    # --- 도우미 메서드 (Helper Methods) ---
 
     def _load_data(self, start_date, end_date):
         """데이터베이스 또는 파일에서 학습 데이터를 로드하고 전처리하는 로직"""

@@ -29,9 +29,9 @@ class BaseTrainer(ABC):
 
             self.session.metrics = metrics
             self.session.feature = feature
-            self.session.finishied_at = timezone.now()
+            self.session.finished_at = timezone.now()
             self.session.state = SessionStateChoices.COMPLETED
-            self.session.save(update_fields=['metrics', 'feature', 'finishied_at', 'state'])
+            self.session.save(update_fields=['metrics', 'feature', 'finished_at', 'state'])
         
         except Exception as e:
             # run_model_logic에서 발생한 모든 예외 처리
