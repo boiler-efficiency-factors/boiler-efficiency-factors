@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 # 💡 실제 XGBoost 라이브러리 import (import xgboost as xgb)
 from xgboost import XGBRegressor
+
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.model_selection import train_test_split
 
@@ -42,8 +43,6 @@ class xgboostTrainer(BaseTrainer):
                 random_state=42
             )
             xgb_model.fit(X_train, y_train)
-            # dtrain = xgb.DMatrix(data.X, label=data.y)
-            # xgb_model = xgb.train(params, dtrain)
             
             # 결과 계산
             metrics = self._calculate_metrics(xgb_model, X_test, y_test)
@@ -67,7 +66,7 @@ class xgboostTrainer(BaseTrainer):
     def _load_data(self, start_date, end_date):
         """데이터 로드 및 전처리 후 학습/테스트 데이터셋 분리"""
         
-        print(f"Loading data for XGBoost from {start_date} to {end_date}...")
+        print(f"Loading data from {start_date} to {end_date}...")
 
         # 사용자가 입력한 기간의 데이터 로드
         df = data_loader.load_data(start_date, end_date)
