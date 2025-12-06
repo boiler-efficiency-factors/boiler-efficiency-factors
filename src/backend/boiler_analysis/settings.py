@@ -52,7 +52,8 @@ INSTALLED_APPS = [
 
     # 3. 로컬 앱
     'boiler_analysis',
-    'users'
+    'users',
+    'workspace'
 ]
 
 
@@ -206,6 +207,15 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
+# Celery settings
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' 
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+CELERY_TASK_IGNORE_RESULT = False
+CELERY_RESULT_EXPIRES = 3600
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELARY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = 'Asia/Seoul'
 
 # ==============================================================================
 # 9. 로깅 (LOGGING)
