@@ -46,7 +46,7 @@ class randomforestTrainer(BaseTrainer):
             
             # 결과 계산
             metrics = self._calculate_metrics(rf_model, X_test, y_test)
-            feature_importance = self._generate_feature_importance_base64(rf_model, X_train)
+            feature_importance = self._generate_feature_importance(rf_model, X_train)
             
             self.session.metrics = metrics
             self.session.feature = feature_importance
