@@ -27,7 +27,7 @@ class xgboostTrainer(BaseTrainer):
             # 데이터 로딩 및 전처리
             X_train, X_test, y_train, y_test = self._set(start_date, end_date)
             
-            # 🌟 실제 XGBoost 모델 학습 실행 코드
+            # 실제 XGBoost 모델 학습 실행 코드
             xgb_model = XGBRegressor(
                 **params,
                 random_state=42
@@ -42,10 +42,11 @@ class xgboostTrainer(BaseTrainer):
                 "test": test_metrics,
                 "train": train_metrics
             }
-            feature_result = feature(xgb_model, X_train)
+            img_base64, top_features_df = feature(xgb_model, X_train)
             
             self.session.metrics = metrics_result
-            self.session.feature = feature_result
+            self.session.feature = img_base64
+            self.session.top_features = top_features_df.to_dict(orient="records")
             
             # 상태 변경 및 DB 저장
             self.session.state = SessionStateChoices.COMPLETED

@@ -67,6 +67,7 @@ class Session(models.Model):
     model_id = models.ForeignKey(Model, on_delete=models.CASCADE, db_column='model_id')
     metrics = models.JSONField(null=True, blank=True)
     feature = models.TextField(null=True, blank=True)
+    top_features = models.JSONField(null=True, blank=True)
     state = models.CharField(max_length=50, choices=SessionStateChoices.choices)
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)

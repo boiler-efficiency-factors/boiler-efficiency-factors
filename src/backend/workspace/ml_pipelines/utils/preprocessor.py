@@ -15,7 +15,10 @@ def preprocessor(raw_df: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.drop(columns=cols_to_drop, errors='ignore')
 
-    # 2. 결측치 처리 및 인코딩 (범주형)
+    # 2. 효율값 필터링
+    df = df[(df['효율(순간)'] > 0) & (df['효율(순간)'] < 100)]
+
+    # 3. 결측치 처리 및 인코딩 (범주형)
     cat_cols = df.select_dtypes(include=['object']).columns
     if not cat_cols.empty:
         # 결측치 -> 최빈값
@@ -28,7 +31,7 @@ def preprocessor(raw_df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].astype(str)
             df[col] = le.fit_transform(df[col])
 
-    # 3. 결측치 처리 및 스케일링 (수치형)
+    # 4. 결측치 처리 및 스케일링 (수치형)
     num_cols = df.select_dtypes(include=np.number).columns
     if not num_cols.empty:
         # 결측치 -> 평균

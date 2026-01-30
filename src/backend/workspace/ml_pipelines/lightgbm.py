@@ -49,10 +49,11 @@ class lightgbmTrainer(BaseTrainer):
                 "test": test_metrics,
                 "train": train_metrics
             }
-            feature_result = feature(lgbm_model, X_train)
+            img_base64, top_features_df = feature(lgbm_model, X_train)
             
             self.session.metrics = metrics_result
-            self.session.feature = feature_result
+            self.session.feature = img_base64
+            self.session.top_features = top_features_df.to_dict(orient="records")
             
             self.session.state = SessionStateChoices.COMPLETED
             self.session.finished_at = timezone.now()
