@@ -31,4 +31,10 @@ urlpatterns = [
      path('home/workspace/get/session/<uuid:model_id>/', 
          WorkspaceSessionView.as_view(), 
          name='workspace-session'),
+    
+    # [신규] 대시보드 현황 조회
+    path('home/dashboard/summary/', DashboardSummaryView.as_view(), name='dashboard-summary'),
+    
+    # [신규] 세션 결과 비교 (예: /api/home/workspace/compare/?ids=uuid,uuid)
+    path('home/workspace/compare/', SessionComparisonView.as_view(), name='session-compare'),
 ]

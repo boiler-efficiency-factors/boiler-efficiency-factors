@@ -211,3 +211,46 @@ class WorkspaceDeleteView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
     
+
+class DashboardSummaryView(APIView):
+    """전일 현황 및 그래프용 데이터 반환"""
+    def get(self, request):
+        # 실제 데이터 집계 로직 (예시)
+        last_log = BoilerOperationLog.objects.order_by('-log_date').first()
+        # 주간 데이터 (최근 7일)
+        weekly_data = BoilerOperationLog.objects.order_by('-log_date')[:7]
+        
+        return Response({
+            "daily_summary": {
+                "pressure": last_log.avg_pressure,
+                "efficiency": last_log.efficiency,
+                "gas": last_log.gas_usage
+            },
+            "weekly_chart": [
+                {"date": log.log_date, "efficiency": log.efficiency} for log in weekly_data
+            ]
+        })
+
+class SessionComparisonView(APIView):
+    """여러 세션 성능 지표 비교 (ids=uuid1,uuid2...)"""
+    @extend_schema(
+        parameters=[OpenApiParameter(name="ids", description="비교할 세션 UUID 리스트 (쉼표구분)", type=str)]
+    )
+    def get(self, request):
+        ids_str = request.query_params.get('ids', '')
+        if not ids_str:
+            return Response({"message": "ID가 제공되지 않았습니다."}, status=400)
+            
+        session_ids = ids_str.split(',')
+        # 선택된 세션들의 성능 지표(metrics)만 가져오기
+        sessions = Session.objects.filter(session_id__in=session_ids)
+        
+        comparison_result = []
+        for s in sessions:
+            comparison_result.append({
+                "session_id": s.session_id,
+                "model_name": s.model_id.model_name,
+                "metrics": s.metrics  # R2, RMSE 등 포함된 JSON
+            })
+            
+        return Response(comparison_result, status=200)

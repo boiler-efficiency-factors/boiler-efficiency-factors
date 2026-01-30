@@ -76,3 +76,25 @@ class Session(models.Model):
     
     def __str__(self):
         return f"Session {self.session_id} - {self.state}"
+    
+
+class BoilerOperationLog(models.Model):
+    """보일러 실시간/일별 운전 데이터 저장"""
+    log_date = models.DateField(unique=True) # 요약 데이터라면 날짜별 유니크
+    avg_pressure = models.FloatField(verbose_name="평균 압력")
+    avg_temp = models.FloatField(verbose_name="배기가스 온도")
+    water_usage = models.FloatField(verbose_name="급수 사용량")
+    gas_usage = models.FloatField(verbose_name="가스 사용량")
+    efficiency = models.FloatField(verbose_name="평균 효율")
+    
+    class Meta:
+        db_table = 'boiler_operation_log'
+
+class MaintenanceHistory(models.Model):
+    """최근 A/S 및 세관 정비 이력 관리"""
+    maintenance_date = models.DateField()
+    content = models.TextField(verbose_name="정비 내용")
+    m_type = models.CharField(max_length=50, choices=[('AS', 'A/S'), ('CLEAN', '세관정비')])
+    
+    class Meta:
+        db_table = 'maintenance_history'

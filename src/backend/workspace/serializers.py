@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Model, MLModelChoices, Session
+from .models import BoilerOperationLog, MaintenanceHistory
 
 class XGBoostParamSerializer(serializers.Serializer):
     max_depth = serializers.IntegerField(
@@ -354,3 +355,69 @@ class WorkspacePaginationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Model
         fields = '__all__'
+
+# 1. 보일러 운전 현황 시리얼라이저 (현황 GUI용)
+class BoilerOperationLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoilerOperationLog
+        fields = '__all__'  # 온도, 압력, 부하율 등 모든 필드 포함
+
+# 2. 유지보수 이력 시리얼라이저 (현황 GUI 하단 특이사항용)
+class MaintenanceHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MaintenanceHistory
+        fields = ['id', 'maintenance_date', 'content', 'maintenance_type']
+
+# 3. 세션 결과 비교를 위한 시리얼라이저 (핵심 추가항목)
+class SessionComparisonSerializer(serializers.ModelSerializer):
+    # Model 인스턴스에서 모델 이름(xgboost 등)을 가져옵니다.
+    model_name = serializers.CharField(source='model_id.model_name', read_only=True)
+    
+    class Meta:
+        model = Session
+        # 성능 비교에 필요한 핵심 지표들만 선별하여 보냅니다.
+        fields = ['session_id', 'model_name', 'metrics', 'state', 'created_at']
+
+# --- 기존 Workspace 관련 시리얼라이저 유지 및 보강 ---
+
+class WorkspaceCreateSerializer(serializers.ModelSerializer):
+    # (기존 코드와 동일)
+    excluded_var = serializers.ListField(
+        child=serializers.CharField(max_length=200),
+        required=False,
+        allow_empty=True
+    )
+    parameter = serializers.JSONField(required=False)
+    
+    PARAM_SERIALIZERS = {
+        'lightgbm': LightGBMParamSerializer,
+        'xgboost': XGBoostParamSerializer,
+        'random_forest': RandomForestParamSerializer,
+        'gradient_boosting': GBMParamSerializer,
+    }
+
+    class Meta:
+        model = Model
+        fields = ['workspace', 'model_name', 'start_date', 'end_date',
+                  'parameter', 'tuning', 'dependent_var', 'excluded_var']
+
+    def validate(self, data):
+        # (기존 validate 로직과 동일)
+        model_name = data.get('model_name')
+        raw_params = data.get('parameter') or {}
+        param_serializer_cls = self.PARAM_SERIALIZERS.get(model_name)
+
+        if param_serializer_cls:
+            serializer = param_serializer_cls(data=raw_params)
+            if not serializer.is_valid():
+                raise serializers.ValidationError({"parameter": serializer.errors})
+            data['parameter'] = serializer.validated_data
+        else:
+            raise serializers.ValidationError({"model_name": f"지원하지 않는 모델입니다. ({model_name})"})
+        return data
+
+# 4. 세션 상세 조회 (기존 코드 유지)
+class SessionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Session
+        fields = ['session_id', 'model_id', 'feature', 'metrics', 'state']
