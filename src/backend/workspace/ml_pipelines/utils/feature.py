@@ -5,10 +5,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import font_manager, rc
 
-def feature(model, X_train: pd.DataFrame, top_n: int = 10) -> str:
+def feature(model, X_train: pd.DataFrame, top_n: int = 10) -> tuple[str, pd.DataFrame]:
     """
     모델의 feature_importances_ 기반으로
     상위 top_n 피처 중요도 그래프를 만들고 base64 PNG 문자열로 반환
+    상위 top_n 피처 중요도와 그래프 반환
     """
     system_name = platform.system()
     if system_name == 'Windows':
@@ -53,4 +54,4 @@ def feature(model, X_train: pd.DataFrame, top_n: int = 10) -> str:
     buffer.seek(0)
 
     img_base64: str = base64.b64encode(buffer.read()).decode("utf-8")
-    return img_base64
+    return img_base64, top_features
